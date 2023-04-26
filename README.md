@@ -1,6 +1,6 @@
 # Conflict Map: Ukraine
 
-[![Screenshot of the Ukraine Conflict Map](img/screenshot.png)](https://peacerep.github.io/ukraine-map/)
+[![Screenshot of the Ukraine Conflict Map](img/hc_screenshot.png)](https://peacerep.github.io/humanitarian-corridors/)
 
 ## Data Sources
 
