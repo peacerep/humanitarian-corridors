@@ -56,7 +56,7 @@ layers.forEach((layer) => {
 });
 
 // auto-generate options boxes for three of the datasets
-let eprColor = "#c48e29";
+
 // color schemes
 let colorScheme = {
   
@@ -297,18 +297,6 @@ document.querySelectorAll(".filterInput").forEach((el) => {
 function updateFilters(layer) {
   let c, t, filters;
   switch (layer) {
-    case "ucdp":
-      c = getCategoryFilter("ucdp", "type_of_violence");
-      t = getDateFilter();
-      filters = ["all", c, t.min, t.max];
-      map.setFilter("ucdp-layer", filters);
-      break;
-    case "acled":
-      c = getCategoryFilter("acled", "event_type");
-      t = getDateFilter();
-      filters = ["all", c, t.min, t.max];
-      map.setFilter("acled-layer", filters);
-      break;
     case "hc":
       c = getCategoryFilter("hc", "status_result");
       t = getDateFilter();
@@ -316,36 +304,7 @@ function updateFilters(layer) {
       map.setFilter("hc-layer", filters);
       map.setFilter("hc-arrow-layer", filters);
       break;
-    case "epr":
-      // t = [
-      //   "==",
-      //   ["get", "from"],
-      //   document.getElementById("epr-time1").checked ? 1991 : 2015,
-      // ];
-      c = getCategoryFilter("epr", "group");
-      map.setFilter("epr-layer", c);
-      map.setFilter("epr-outline-layer", c);
-      // combine + set filters
-      // map.setFilter("epr-layer", ["all", c, t]);
-      // map.setFilter("epr-outline-layer", ["all", c, t]);
-      break;
-    case "powerplants":
-      // no time filter
-      // check if all or nuclear only
-      if (document.getElementById("toggle-nuclear-only").checked) {
-        map.setFilter("powerplants-layer", [
-          "any",
-          ["==", ["get", "primary_fuel"], "Nuclear"],
-          [
-            "==",
-            ["get", "primary_fuel"],
-            "Nuclear – undergoing decommissioning",
-          ],
-        ]);
-      } else {
-        map.setFilter("powerplants-layer", true);
-      }
-      break;
+    
     default:
       console.log("error - filters not implemented for layer: ", layer);
   }
