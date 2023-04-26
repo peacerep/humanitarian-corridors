@@ -96,8 +96,6 @@ Object.keys(colorScheme).forEach(function (layer) {
     .attr("class", "checkmark")
     .style("background-color", (d) => d[1]);
 });
-// ensure nuclear-only toggle is checked (added in html)
-document.getElementById("toggle-nuclear-only").checked = true;
 
 // add zoom to region feature
 d3.json("data/ukraine_bounds.json").then(function (data) {
