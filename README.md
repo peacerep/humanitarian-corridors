@@ -1,10 +1,13 @@
-# Conflict Map: Ukraine
+# Humanitarian Corridor Map: Ukraine
 
 [![Screenshot of the Ukraine Conflict Map](img/hc_screenshot.png)](https://peacerep.github.io/humanitarian-corridors/)
 
+## Map Development
+This map was designed and developed by Sarah Schöttler for PeaceRep at the University of Edinburgh.  
+
 ## Data Sources
 
-Data sources and updating instructions are documented at [observablehq.com/@sarah37/conflict-map-data](https://observablehq.com/@sarah37/conflict-map-data). Data sources are also included on the map itself, using the `(?)` buttons in the sidebar.
+The data utilised to represent these humanitarian corridors was manually collected by PeaceRep partners, and manually geocoded to represent the start and end points of the corridors. Please note the lines do not represent any other location data, such as route taken. They only represent the start and end locations. 
 
 ## Libraries
 
