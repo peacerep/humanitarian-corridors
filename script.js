@@ -1,5 +1,9 @@
 "use strict";
 
+//uncheck all layers to overwrite any that might still be checked in cache
+document.querySelectorAll(".layerToggle").forEach((el) => {
+  el.checked = false;
+});
 
 const initBBox = [
   [21.2, 42.9], // [west, south]
@@ -30,9 +34,17 @@ const layerUnder = "place-other";
 const minZoom = map.getZoom() - 1;
 map.setMinZoom(minZoom);
 
-const layers = ["hc"];
+const layers = ["acled", "ucdp", "epr", "powerplants", "hc"];
 
-
+// check for URL parameters
+const url = new URL(window.location.href);
+const layerSettings =
+  url.searchParams.has("layers") && url.searchParams.get("layers") == "hc"
+    ? // custom: hc only
+      { acled: false, ucdp: false, epr: false, powerplants: false, hc: true }
+    : // default settings
+      // sub-options for each layer are always all checked by default
+      { acled: true, ucdp: true, epr: false, powerplants: true, hc: false };
 
 // check boxes accordingly once layers are loaded (see end of map initialization function below)
 
@@ -56,18 +68,46 @@ layers.forEach((layer) => {
 let eprColor = "#c48e29";
 // color schemes
 let colorScheme = {
-  
+  // ACLED event_type color scheme
+  acled: [
+    ["Battles", d3.schemeTableau10[0]],
+    ["Explosions/Remote violence", d3.schemeTableau10[1]],
+    ["Protests", d3.schemeTableau10[2]],
+    ["Riots", d3.schemeTableau10[3]],
+    ["Strategic developments", d3.schemeTableau10[4]],
+    ["Violence against civilians", d3.schemeTableau10[5]],
+  ],
+  // UCDP type_of_violence color scheme
+  ucdp: [
+    ["1", d3.schemeTableau10[6]],
+    ["2", d3.schemeTableau10[7]],
+    ["3", d3.schemeTableau10[8]],
+  ],
   // humanitarian corridors status_result color scheme
   hc: [
     ["successful", "#0e73bd"],
     ["disputed", "#860ebd"],
     ["unsuccessful/disrupted", "#a40909"],
     ["proposed route/outcome unknown", "#888"],
-  ]
-  
+  ],
+  // epr group color scheme -- could add different colors for each here
+  epr: [
+    ["Ukrainians", eprColor],
+    ["Russians", eprColor],
+    ["Rusyns", eprColor],
+    ["Romanians/Moldovans", eprColor],
+    ["Hungarians", eprColor],
+    ["Crimean Tatars", eprColor], // these are not in the 2015-21 data
+  ],
 };
 let optionLabels = {
-  hc: (d) => d
+  acled: (d) => d,
+  ucdp: (d) =>
+    ["State-Based Conflict", "Non-State Conflict", "One-Sided Violence"][
+      +d - 1
+    ],
+  hc: (d) => d,
+  epr: (d) => d,
 };
 // add option menus
 Object.keys(colorScheme).forEach(function (layer) {
@@ -92,7 +132,8 @@ Object.keys(colorScheme).forEach(function (layer) {
     .attr("class", "checkmark")
     .style("background-color", (d) => d[1]);
 });
-
+// ensure nuclear-only toggle is checked (added in html)
+document.getElementById("toggle-nuclear-only").checked = true;
 
 // add zoom to region feature
 d3.json("data/ukraine_bounds.json").then(function (data) {
@@ -124,9 +165,88 @@ d3.json("data/ukraine_bounds.json").then(function (data) {
 });
 
 Promise.all([
+  d3.csv("data/ACLED-Ukraine.csv"), // ACLED
+  d3.csv("data/UCDP-Ukraine.csv"), // UCDP
+  d3.csv("data/global_power_plant_database_ukraine.csv"), // power plant locations
+  d3.csv("data/ukraine_power_plants_extra_info.csv"), // power plant additional data
+  d3.json("data/GeoEPR-2021-Ukraine.geojson"), // EPR ethnic makeup
   d3.csv("data/Humanitarian Corridors Ukraine - HC_geocoded.csv"), // humanitarian corridors
 ]).then(function (data) {
   // modify data
+
+  // turn acled csv into geojson
+  const acled = {
+    type: "FeatureCollection",
+    features: data[0].map((e) => {
+      return {
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [e.longitude, e.latitude],
+        },
+        properties: e,
+      };
+    }),
+  };
+  acled.features.forEach(function (d) {
+    d.properties.timestamp_start = new Date(d.properties.event_date).getTime();
+    d.properties.timestamp_end = new Date(d.properties.event_date).getTime();
+  });
+
+  // turn ucdp csv into geojson
+  const ucdp = {
+    type: "FeatureCollection",
+    features: data[1].map(function (e) {
+      return {
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [e.longitude, e.latitude],
+        },
+        properties: e,
+      };
+    }),
+  };
+  ucdp.features.forEach(function (d) {
+    d.properties.timestamp_start = new Date(d.properties.date_start).getTime();
+    d.properties.timestamp_end = new Date(d.properties.date_end).getTime();
+  });
+
+  const powerplants = data[2];
+  const powerplants2 = data[3];
+  // find keys that are used in the second dataset but not the first one
+  let addKeys = Object.keys(powerplants2[0]).filter(
+    (k) => !Object.keys(powerplants[0]).includes(k)
+  );
+
+  powerplants2.forEach((el) => {
+    // add additional data from the second dataset to the first dataset
+    if (el.dataset === "Global Power Plant Database") {
+      // find entry in powerplants db and add info
+      let index = powerplants.findIndex((d) => d.gppd_idnr === el.gppd_idnr);
+      addKeys.forEach((k) => {
+        powerplants[index][k] = el[k];
+      });
+    } else {
+      // if id cannot be found (should only be for Chernobyl), add a new element
+      powerplants.push(el);
+    }
+  });
+  const powerplants_geojson = {
+    type: "FeatureCollection",
+    features: powerplants.map(function (el) {
+      return {
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [+el.longitude, +el.latitude],
+        },
+        properties: el,
+      };
+    }),
+  };
+
+  const epr = data[4];
 
   const hc = data[5];
   const hc_geojson = {
@@ -154,12 +274,197 @@ Promise.all([
 
   // when map is ready, add data sources + vis layers
   map.on("load", function () {
+    map.addSource("acled", {
+      type: "geojson",
+      data: acled,
+    });
+
+    map.addSource("ucdp", {
+      type: "geojson",
+      data: ucdp,
+    });
+
+    map.addSource("epr", {
+      type: "geojson",
+      data: epr,
+    });
+
+    map.addSource("powerplants", {
+      type: "geojson",
+      data: powerplants_geojson,
+    });
+
     map.addSource("hc", {
       type: "geojson",
       data: hc_geojson,
     });
 
     var popup = new maplibregl.Popup();
+
+    map.addLayer(
+      {
+        id: "epr-layer",
+        type: "fill",
+        source: "epr",
+        paint: {
+          "fill-color": [
+            "match",
+            ["get", "group"],
+            ...colorScheme.epr.flat(),
+            eprColor, // for missing types
+          ],
+          "fill-opacity": 0.25,
+        },
+        layout: {
+          visibility: "none",
+        },
+      },
+      layerUnder
+    );
+    map.addLayer(
+      {
+        id: "epr-outline-layer",
+        type: "line",
+        source: "epr",
+        paint: {
+          "line-color": [
+            "match",
+            ["get", "group"],
+            ...colorScheme.epr.flat(),
+            eprColor, // for missing types
+          ],
+          "line-width": 1,
+        },
+        layout: {
+          visibility: "none",
+        },
+      },
+      layerUnder
+    );
+    map.on("click", "epr-layer", (e) => {
+      var coordinates = e.lngLat;
+      var tooltip = "Ethnic group: " + e.features[0].properties.group;
+      popup.setLngLat(coordinates).setHTML(tooltip).addTo(map);
+    });
+
+    map.addLayer(
+      {
+        id: "acled-layer",
+        type: "circle",
+        source: "acled",
+        paint: {
+          "circle-color": [
+            "match",
+            ["get", "event_type"],
+            ...colorScheme.acled.flat(),
+            d3.schemeTableau10[9], // grey for missing types
+          ],
+          "circle-opacity": 0.7,
+          "circle-radius": 4,
+        },
+        layout: {
+          visibility: "none",
+        },
+      },
+      layerUnder
+    );
+
+    map.addLayer(
+      {
+        id: "ucdp-layer",
+        type: "circle",
+        source: "ucdp",
+        paint: {
+          "circle-color": [
+            "match",
+            ["get", "type_of_violence"],
+            ...colorScheme.ucdp.flat(),
+            d3.schemeTableau10[9], // grey for missing types
+          ],
+          "circle-opacity": 0.7,
+          "circle-radius": 4,
+        },
+        layout: {
+          visibility: "none",
+        },
+      },
+      layerUnder
+    );
+
+    map.loadImage("img/symbol_power.png", (error, img1) => {
+      map.loadImage("img/symbol_nuclear.png", (error, img2) => {
+        map.loadImage("img/symbol_nuclear_decom.png", (error, img3) => {
+          map.addImage("symbol_power", img1);
+          map.addImage("symbol_nuclear", img2);
+          map.addImage("symbol_nuclear_decom", img3);
+
+          map.addLayer(
+            {
+              id: "powerplants-layer",
+              type: "symbol",
+              source: "powerplants",
+              layout: {
+                visibility: "none",
+                "icon-allow-overlap": true,
+                "icon-image": [
+                  "case",
+                  ["==", ["get", "primary_fuel"], "Nuclear"],
+                  "symbol_nuclear",
+                  [
+                    "case",
+                    [
+                      "==",
+                      ["get", "primary_fuel"],
+                      "Nuclear – undergoing decommissioning",
+                    ],
+                    "symbol_nuclear_decom",
+                    "symbol_power",
+                  ],
+                ],
+                "icon-size": 0.5,
+                "symbol-sort-key": [
+                  "case",
+                  [
+                    "any",
+                    ["==", ["get", "primary_fuel"], "Nuclear"],
+                    [
+                      "==",
+                      ["get", "primary_fuel"],
+                      "Nuclear – undergoing decommissioning",
+                    ],
+                  ],
+                  1,
+                  0,
+                ],
+              },
+            },
+            layerUnder
+          );
+        });
+      });
+    });
+
+    map.on("click", "powerplants-layer", (e) => {
+      var coordinates = e.features[0].geometry.coordinates.slice();
+      var tooltip =
+        "<b>" +
+        e.features[0].properties.name +
+        " (" +
+        e.features[0].properties.primary_fuel +
+        ")</b><br>" +
+        e.features[0].properties.tooltip_info +
+        "<br><b>Source:</b> " +
+        e.features[0].properties.additional_info_source_with_html;
+      popup.setLngLat(coordinates).setHTML(tooltip).addTo(map);
+    });
+    // change cursor to pointer when on the powerplants layer
+    map.on("mouseenter", "powerplants-layer", () => {
+      map.getCanvas().style.cursor = "pointer";
+    });
+    map.on("mouseleave", "powerplants-layer", () => {
+      map.getCanvas().style.cursor = "";
+    });
+
     map.addLayer(
       {
         id: "hc-layer",
@@ -289,12 +594,54 @@ document.querySelectorAll(".filterInput").forEach((el) => {
 function updateFilters(layer) {
   let c, t, filters;
   switch (layer) {
+    case "ucdp":
+      c = getCategoryFilter("ucdp", "type_of_violence");
+      t = getDateFilter();
+      filters = ["all", c, t.min, t.max];
+      map.setFilter("ucdp-layer", filters);
+      break;
+    case "acled":
+      c = getCategoryFilter("acled", "event_type");
+      t = getDateFilter();
+      filters = ["all", c, t.min, t.max];
+      map.setFilter("acled-layer", filters);
+      break;
     case "hc":
       c = getCategoryFilter("hc", "status_result");
       t = getDateFilter();
       filters = ["all", c, t.min, t.max];
       map.setFilter("hc-layer", filters);
       map.setFilter("hc-arrow-layer", filters);
+      break;
+    case "epr":
+      // t = [
+      //   "==",
+      //   ["get", "from"],
+      //   document.getElementById("epr-time1").checked ? 1991 : 2015,
+      // ];
+      c = getCategoryFilter("epr", "group");
+      map.setFilter("epr-layer", c);
+      map.setFilter("epr-outline-layer", c);
+      // combine + set filters
+      // map.setFilter("epr-layer", ["all", c, t]);
+      // map.setFilter("epr-outline-layer", ["all", c, t]);
+      break;
+    case "powerplants":
+      // no time filter
+      // check if all or nuclear only
+      if (document.getElementById("toggle-nuclear-only").checked) {
+        map.setFilter("powerplants-layer", [
+          "any",
+          ["==", ["get", "primary_fuel"], "Nuclear"],
+          [
+            "==",
+            ["get", "primary_fuel"],
+            "Nuclear – undergoing decommissioning",
+          ],
+        ]);
+      } else {
+        map.setFilter("powerplants-layer", true);
+      }
       break;
     default:
       console.log("error - filters not implemented for layer: ", layer);
