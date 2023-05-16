@@ -1,9 +1,9 @@
 "use strict";
 
 //uncheck all layers to overwrite any that might still be checked in cache
-document.querySelectorAll(".layerToggle").forEach((el) => {
-    el.checked = false;
-});
+//document.querySelectorAll(".layerToggle").forEach((el) => {
+//    el.checked = false;
+//});
 
 const initBBox = [
     [21.2, 42.9], // [west, south]
@@ -37,14 +37,14 @@ map.setMinZoom(minZoom);
 const layers = ["acled", "ucdp", "epr", "powerplants", "hc"];
 
 // check for URL parameters
-const url = new URL(window.location.href);
-const layerSettings =
-    url.searchParams.has("layers") && url.searchParams.get("layers") == "hc"
-        ? // custom: hc only
-        { acled: false, ucdp: false, epr: false, powerplants: false, hc: true }
-        : // default settings
+//const url = new URL(window.location.href);
+//const layerSettings =
+//    url.searchParams.has("layers") && url.searchParams.get("layers") == "hc"
+//        ? // custom: hc only
+//        { acled: false, ucdp: false, epr: false, powerplants: false, hc: true }
+//        : // default settings
         // sub-options for each layer are always all checked by default
-        { acled: true, ucdp: true, epr: false, powerplants: true, hc: false };
+//        { acled: true, ucdp: true, epr: false, powerplants: true, hc: false };
 
 // check boxes accordingly once layers are loaded (see end of map initialization function below)
 
