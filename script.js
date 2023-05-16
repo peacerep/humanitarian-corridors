@@ -274,20 +274,20 @@ Promise.all([
 
     // when map is ready, add data sources + vis layers
     map.on("load", function () {
-        //map.addSource("acled", {
-        //    type: "geojson",
-        //    data: acled,
-       // });
+        map.addSource("acled", {
+            type: "geojson",
+            data: acled,
+        });
 
-      //  map.addSource("ucdp", {
-      //      type: "geojson",
-       //     data: ucdp,
-       // });
+        map.addSource("ucdp", {
+            type: "geojson",
+            data: ucdp,
+        });
 
-      //  map.addSource("epr", {
-      //      type: "geojson",
-      //      data: epr,
-     //   });
+        map.addSource("epr", {
+            type: "geojson",
+            data: epr,
+        });
 
         map.addSource("powerplants", {
             type: "geojson",
@@ -301,95 +301,95 @@ Promise.all([
 
         var popup = new maplibregl.Popup();
 
-      //  map.addLayer(
-     //       {
-     //           id: "epr-layer",
-     //           type: "fill",
-     //           source: "epr",
-    //            paint: {
-     //               "fill-color": [
-     //                   "match",
-     //                   ["get", "group"],
-     //                   ...colorScheme.epr.flat(),
-     //                   eprColor, // for missing types
-     //               ],
-     //               "fill-opacity": 0.25,
-     //           },
-     //           layout: {
-      //              visibility: "none",
-     //           },
-     //       },
-    //        layerUnder
-   //     );
- //       map.addLayer(
-  //          {
-  //              id: "epr-outline-layer",
-  //              type: "line",
- //               source: "epr",
- //               paint: {
-  //                  "line-color": [
- //                       "match",
-  //                      ["get", "group"],
- //                       ...colorScheme.epr.flat(),
- //                       eprColor, // for missing types
- //                   ],
- //                   "line-width": 1,
- //               },
- //               layout: {
- //                   visibility: "none",
- //               },
- //           },
- //           layerUnder
-//        );
-//        map.on("click", "epr-layer", (e) => {
-//            var coordinates = e.lngLat;
-//            var tooltip = "Ethnic group: " + e.features[0].properties.group;
-//            popup.setLngLat(coordinates).setHTML(tooltip).addTo(map);
-//        });
+        map.addLayer(
+            {
+                id: "epr-layer",
+                type: "fill",
+                source: "epr",
+                paint: {
+                    "fill-color": [
+                        "match",
+                        ["get", "group"],
+                        ...colorScheme.epr.flat(),
+                        eprColor, // for missing types
+                    ],
+                    "fill-opacity": 0.25,
+                },
+                layout: {
+                    visibility: "none",
+                },
+            },
+            layerUnder
+        );
+        map.addLayer(
+            {
+                id: "epr-outline-layer",
+                type: "line",
+                source: "epr",
+                paint: {
+                    "line-color": [
+                        "match",
+                        ["get", "group"],
+                        ...colorScheme.epr.flat(),
+                        eprColor, // for missing types
+                    ],
+                    "line-width": 1,
+                },
+                layout: {
+                    visibility: "none",
+                },
+            },
+            layerUnder
+        );
+        map.on("click", "epr-layer", (e) => {
+            var coordinates = e.lngLat;
+            var tooltip = "Ethnic group: " + e.features[0].properties.group;
+            popup.setLngLat(coordinates).setHTML(tooltip).addTo(map);
+        });
 
-//        map.addLayer(
-//            {
- //               id: "acled-layer",
-//                type: "circle",
-//                source: "acled",
-//                paint: {
-//                    "circle-color": [
-//                        "match",
-//                        ["get", "event_type"],
-//                        ...colorScheme.acled.flat(),
-//                        d3.schemeTableau10[9], // grey for missing types
-//                    ],
-//                    "circle-opacity": 0.7,
-//                    "circle-radius": 4,
-//                },
-//                layout: {
-//                    visibility: "none",
-//                },
-//            },
-//            layerUnder
-//        );
+        map.addLayer(
+            {
+                id: "acled-layer",
+                type: "circle",
+                source: "acled",
+                paint: {
+                    "circle-color": [
+                        "match",
+                        ["get", "event_type"],
+                        ...colorScheme.acled.flat(),
+                        d3.schemeTableau10[9], // grey for missing types
+                    ],
+                    "circle-opacity": 0.7,
+                    "circle-radius": 4,
+                },
+                layout: {
+                    visibility: "none",
+                },
+            },
+            layerUnder
+        );
 
-//        map.addLayer(
-//            {
-//                id: "ucdp-layer",
-//                type: "circle",
-//                source: "ucdp",
-//                paint: {
-//                    "circle-color": [
-//                        "match",
-//                        ["get", "type_of_violence"],
-//                        ...colorScheme.ucdp.flat(),
-//                        d3.schemeTableau10[9], // grey for missing types
-//                    ],
-//                    "circle-opacity": 0.7,
-//                    "circle-radius": 4,
-//                },
-//                layout: {
-//                    visibility: "none",
-//                },
- //           },
-//            layerUnder
-//        );
+        map.addLayer(
+            {
+                id: "ucdp-layer",
+                type: "circle",
+                source: "ucdp",
+                paint: {
+                    "circle-color": [
+                        "match",
+                        ["get", "type_of_violence"],
+                        ...colorScheme.ucdp.flat(),
+                        d3.schemeTableau10[9], // grey for missing types
+                    ],
+                    "circle-opacity": 0.7,
+                    "circle-radius": 4,
+                },
+                layout: {
+                    visibility: "none",
+                },
+            },
+            layerUnder
+        );
 
         map.loadImage("img/symbol_power.png", (error, img1) => {
             map.loadImage("img/symbol_nuclear.png", (error, img2) => {
