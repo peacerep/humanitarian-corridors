@@ -38,13 +38,13 @@ const layers = ["acled", "ucdp", "epr", "powerplants", "hc"];
 
 // check for URL parameters
 const url = new URL(window.location.href);
-//const layerSettings =
-   // url.searchParams.has("layers") && url.searchParams.get("layers") == "hc"
-       // ? // custom: hc only
-       // { acled: false, ucdp: false, epr: false, powerplants: false, hc: true }
-       // : // default settings
+const layerSettings =
+    url.searchParams.has("layers") && url.searchParams.get("layers") == "hc"
+        ? // custom: hc only
+        { acled: false, ucdp: false, epr: false, powerplants: false, hc: true }
+        : // default settings
         // sub-options for each layer are always all checked by default
-        //{ acled: true, ucdp: true, epr: false, powerplants: true, hc: false };
+        { acled: true, ucdp: true, epr: false, powerplants: true, hc: false };
 
 // check boxes accordingly once layers are loaded (see end of map initialization function below)
 
@@ -65,24 +65,24 @@ layers.forEach((layer) => {
 });
 
 // auto-generate options boxes for three of the datasets
-//let eprColor = "#c48e29";
+let eprColor = "#c48e29";
 // color schemes
-//let colorScheme = {
+let colorScheme = {
     // ACLED event_type color scheme
-    //acled: [
-     //   ["Battles", d3.schemeTableau10[0]],
-     //   ["Explosions/Remote violence", d3.schemeTableau10[1]],
-     //     ["Protests", d3.schemeTableau10[2]],
-      //  ["Riots", d3.schemeTableau10[3]],
-      //  ["Strategic developments", d3.schemeTableau10[4]],
-      //  ["Violence against civilians", d3.schemeTableau10[5]],
- //   ],
+    acled: [
+        ["Battles", d3.schemeTableau10[0]],
+        ["Explosions/Remote violence", d3.schemeTableau10[1]],
+        ["Protests", d3.schemeTableau10[2]],
+        ["Riots", d3.schemeTableau10[3]],
+        ["Strategic developments", d3.schemeTableau10[4]],
+        ["Violence against civilians", d3.schemeTableau10[5]],
+    ],
     // UCDP type_of_violence color scheme
-  //  ucdp: [
-  //      ["1", d3.schemeTableau10[6]],
- //       ["2", d3.schemeTableau10[7]],
-  //      ["3", d3.schemeTableau10[8]],
-  //  ],
+    ucdp: [
+        ["1", d3.schemeTableau10[6]],
+        ["2", d3.schemeTableau10[7]],
+        ["3", d3.schemeTableau10[8]],
+    ],
     // humanitarian corridors status_result color scheme
     hc: [
         ["successful", "#0e73bd"],
@@ -91,23 +91,23 @@ layers.forEach((layer) => {
         ["proposed route/outcome unknown", "#888"],
     ],
     // epr group color scheme -- could add different colors for each here
-  //  epr: [
- //       ["Ukrainians", eprColor],
- //       ["Russians", eprColor],
-//        ["Rusyns", eprColor],
- //       ["Romanians/Moldovans", eprColor],
- //       ["Hungarians", eprColor],
-//        ["Crimean Tatars", eprColor], // these are not in the 2015-21 data
-//    ],
-//};
+    epr: [
+        ["Ukrainians", eprColor],
+        ["Russians", eprColor],
+        ["Rusyns", eprColor],
+        ["Romanians/Moldovans", eprColor],
+        ["Hungarians", eprColor],
+        ["Crimean Tatars", eprColor], // these are not in the 2015-21 data
+    ],
+};
 let optionLabels = {
-    // acled: (d) => d,
-   // ucdp: (d) =>
-    //    ["State-Based Conflict", "Non-State Conflict", "One-Sided Violence"][
-     //   +d - 1
-   //     ],
+    acled: (d) => d,
+    ucdp: (d) =>
+        ["State-Based Conflict", "Non-State Conflict", "One-Sided Violence"][
+        +d - 1
+        ],
     hc: (d) => d,
-   // epr: (d) => d,
+    epr: (d) => d,
 };
 // add option menus
 Object.keys(colorScheme).forEach(function (layer) {
@@ -165,52 +165,52 @@ d3.json("data/ukraine_bounds.json").then(function (data) {
 });
 
 Promise.all([
-   // d3.csv("data/ACLED-Ukraine.csv"), // ACLED
-  //  d3.csv("data/UCDP-Ukraine.csv"), // UCDP
+    d3.csv("data/ACLED-Ukraine.csv"), // ACLED
+    d3.csv("data/UCDP-Ukraine.csv"), // UCDP
     d3.csv("data/global_power_plant_database_ukraine.csv"), // power plant locations
     d3.csv("data/ukraine_power_plants_extra_info.csv"), // power plant additional data
- //   d3.json("data/GeoEPR-2021-Ukraine.geojson"), // EPR ethnic makeup
+    d3.json("data/GeoEPR-2021-Ukraine.geojson"), // EPR ethnic makeup
     d3.csv("data/Humanitarian Corridors Ukraine - HC_geocoded.csv"), // humanitarian corridors
 ]).then(function (data) {
     // modify data
 
     // turn acled csv into geojson
-  //  const acled = {
-     //   type: "FeatureCollection",
-     //   features: data[0].map((e) => {
-     //       return {
-     //           type: "Feature",
-     //           geometry: {
-     //               type: "Point",
-      //              coordinates: [e.longitude, e.latitude],
-      //          },
-       //         properties: e,
-       //     };
-      //  }),
-   // };
-   // acled.features.forEach(function (d) {
-   //     d.properties.timestamp_start = new Date(d.properties.event_date).getTime();
-   //     d.properties.timestamp_end = new Date(d.properties.event_date).getTime();
-   // });
+    const acled = {
+        type: "FeatureCollection",
+        features: data[0].map((e) => {
+            return {
+                type: "Feature",
+                geometry: {
+                    type: "Point",
+                    coordinates: [e.longitude, e.latitude],
+                },
+                properties: e,
+            };
+        }),
+    };
+    acled.features.forEach(function (d) {
+        d.properties.timestamp_start = new Date(d.properties.event_date).getTime();
+        d.properties.timestamp_end = new Date(d.properties.event_date).getTime();
+    });
 
     // turn ucdp csv into geojson
-  //  const ucdp = {
-    //    type: "FeatureCollection",
-   //     features: data[1].map(function (e) {
-    //        return {
-   //             type: "Feature",
-    //            geometry: {
-    //                type: "Point",
-    //                coordinates: [e.longitude, e.latitude],
-   //             },
-   //             properties: e,
-   //         };
-   //     }),
-   // };
-  //  ucdp.features.forEach(function (d) {
-  //      d.properties.timestamp_start = new Date(d.properties.date_start).getTime();
- //       d.properties.timestamp_end = new Date(d.properties.date_end).getTime();
- //   });
+    const ucdp = {
+        type: "FeatureCollection",
+        features: data[1].map(function (e) {
+            return {
+                type: "Feature",
+                geometry: {
+                    type: "Point",
+                    coordinates: [e.longitude, e.latitude],
+                },
+                properties: e,
+            };
+        }),
+    };
+    ucdp.features.forEach(function (d) {
+        d.properties.timestamp_start = new Date(d.properties.date_start).getTime();
+        d.properties.timestamp_end = new Date(d.properties.date_end).getTime();
+    });
 
     const powerplants = data[2];
     const powerplants2 = data[3];
@@ -246,7 +246,7 @@ Promise.all([
         }),
     };
 
- //   const epr = data[4];
+    const epr = data[4];
 
     const hc = data[5];
     const hc_geojson = {
@@ -274,25 +274,25 @@ Promise.all([
 
     // when map is ready, add data sources + vis layers
     map.on("load", function () {
-   //     map.addSource("acled", {
-  //          type: "geojson",
-   //         data: acled,
-   //     });
+        map.addSource("acled", {
+            type: "geojson",
+            data: acled,
+        });
 
-    //    map.addSource("ucdp", {
-     //       type: "geojson",
-     //       data: ucdp,
-     //   });
+        map.addSource("ucdp", {
+            type: "geojson",
+            data: ucdp,
+        });
 
-     //   map.addSource("epr", {
-    //        type: "geojson",
-   //         data: epr,
-   //     });
+        map.addSource("epr", {
+            type: "geojson",
+            data: epr,
+        });
 
-  //      map.addSource("powerplants", {
-   //         type: "geojson",
-   //         data: powerplants_geojson,
-   //     });
+        map.addSource("powerplants", {
+            type: "geojson",
+            data: powerplants_geojson,
+        });
 
         map.addSource("hc", {
             type: "geojson",
@@ -301,7 +301,7 @@ Promise.all([
 
         var popup = new maplibregl.Popup();
 
-  //      map.addLayer(
+        map.addLayer(
             {
                 id: "epr-layer",
                 type: "fill",
@@ -321,7 +321,7 @@ Promise.all([
             },
             layerUnder
         );
-   //     map.addLayer(
+        map.addLayer(
             {
                 id: "epr-outline-layer",
                 type: "line",
@@ -341,55 +341,55 @@ Promise.all([
             },
             layerUnder
         );
-   //     map.on("click", "epr-layer", (e) => {
+        map.on("click", "epr-layer", (e) => {
             var coordinates = e.lngLat;
             var tooltip = "Ethnic group: " + e.features[0].properties.group;
             popup.setLngLat(coordinates).setHTML(tooltip).addTo(map);
         });
 
-//        map.addLayer(
-  //          {
-  //              id: "acled-layer",
-    //            type: "circle",
-      //          source: "acled",
-       //         paint: {
-         //           "circle-color": [
-           //             "match",
-             //           ["get", "event_type"],
-               //         ...colorScheme.acled.flat(),
-                 //       d3.schemeTableau10[9], // grey for missing types
-                   // ],
-               //     "circle-opacity": 0.7,
-                //    "circle-radius": 4,
-          //      },
-            //    layout: {
-              //      visibility: "none",
-          //      },
-           // },
-         //   layerUnder
-       // );
+        map.addLayer(
+            {
+                id: "acled-layer",
+                type: "circle",
+                source: "acled",
+                paint: {
+                    "circle-color": [
+                        "match",
+                        ["get", "event_type"],
+                        ...colorScheme.acled.flat(),
+                        d3.schemeTableau10[9], // grey for missing types
+                    ],
+                    "circle-opacity": 0.7,
+                    "circle-radius": 4,
+                },
+                layout: {
+                    visibility: "none",
+                },
+            },
+            layerUnder
+        );
 
-  //      map.addLayer(
-  //          {
-  //              id: "ucdp-layer",
-  //              type: "circle",
- //               source: "ucdp",
- //               paint: {
- //                   "circle-color": [
- //                       "match",
-//                        ["get", "type_of_violence"],
-//                        ...colorScheme.ucdp.flat(),
-//                        d3.schemeTableau10[9], // grey for missing types
-//                    ],
- //                   "circle-opacity": 0.7,
- //                   "circle-radius": 4,
- //               },
- //               layout: {
- //                   visibility: "none",
- //               },
-//            },
-//            layerUnder
- //       );
+        map.addLayer(
+            {
+                id: "ucdp-layer",
+                type: "circle",
+                source: "ucdp",
+                paint: {
+                    "circle-color": [
+                        "match",
+                        ["get", "type_of_violence"],
+                        ...colorScheme.ucdp.flat(),
+                        d3.schemeTableau10[9], // grey for missing types
+                    ],
+                    "circle-opacity": 0.7,
+                    "circle-radius": 4,
+                },
+                layout: {
+                    visibility: "none",
+                },
+            },
+            layerUnder
+        );
 
         map.loadImage("img/symbol_power.png", (error, img1) => {
             map.loadImage("img/symbol_nuclear.png", (error, img2) => {
@@ -594,18 +594,18 @@ document.querySelectorAll(".filterInput").forEach((el) => {
 function updateFilters(layer) {
     let c, t, filters;
     switch (layer) {
-    //    case "ucdp":
-    //        c = getCategoryFilter("ucdp", "type_of_violence");
-   //         t = getDateFilter();
-   //         filters = ["all", c, t.min, t.max];
-   //         map.setFilter("ucdp-layer", filters);
-   //         break;
-   //     case "acled":
-  //          c = getCategoryFilter("acled", "event_type");
-  //          t = getDateFilter();
-  //          filters = ["all", c, t.min, t.max];
-  //          map.setFilter("acled-layer", filters);
-  //          break;
+        case "ucdp":
+            c = getCategoryFilter("ucdp", "type_of_violence");
+            t = getDateFilter();
+            filters = ["all", c, t.min, t.max];
+            map.setFilter("ucdp-layer", filters);
+            break;
+        case "acled":
+            c = getCategoryFilter("acled", "event_type");
+            t = getDateFilter();
+            filters = ["all", c, t.min, t.max];
+            map.setFilter("acled-layer", filters);
+            break;
         case "hc":
             c = getCategoryFilter("hc", "status_result");
             t = getDateFilter();
@@ -613,19 +613,19 @@ function updateFilters(layer) {
             map.setFilter("hc-layer", filters);
             map.setFilter("hc-arrow-layer", filters);
             break;
-  //      case "epr":
+        case "epr":
             // t = [
             //   "==",
             //   ["get", "from"],
             //   document.getElementById("epr-time1").checked ? 1991 : 2015,
             // ];
-  //          c = getCategoryFilter("epr", "group");
- //           map.setFilter("epr-layer", c);
-  //          map.setFilter("epr-outline-layer", c);
+            c = getCategoryFilter("epr", "group");
+            map.setFilter("epr-layer", c);
+            map.setFilter("epr-outline-layer", c);
             // combine + set filters
             // map.setFilter("epr-layer", ["all", c, t]);
             // map.setFilter("epr-outline-layer", ["all", c, t]);
- //           break;
+            break;
         case "powerplants":
             // no time filter
             // check if all or nuclear only
