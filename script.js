@@ -34,7 +34,7 @@ const layerUnder = "place-other";
 const minZoom = map.getZoom() - 1;
 map.setMinZoom(minZoom);
 
-const layers = ["acled", "ucdp", "epr", "powerplants", "hc"];
+const layers = ["hc", "powerplants"];
 
 // check for URL parameters
 const url = new URL(window.location.href);
@@ -44,7 +44,7 @@ const layerSettings =
       { acled: false, ucdp: false, epr: false, powerplants: false, hc: true }
     : // default settings
       // sub-options for each layer are always all checked by default
-      { hc: true, powerplants: true, acled: false, ucdp: false, epr: false,   };
+      { hc: true, powerplants: true   };
 
 // check boxes accordingly once layers are loaded (see end of map initialization function below)
 
