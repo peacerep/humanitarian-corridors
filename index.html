@@ -83,7 +83,24 @@
                            class="filterInput" />
                 </div>
 
-
+ 		<div id="hc-header" class="layerHeader loading">
+                    <input type="checkbox"
+                           name="Humanitarian Corridors"
+                           id="toggle-hc"
+                           class="filterInput layerToggle" />
+                    <label for="toggle-hc" class="labelDataset">
+                        Humanitarian Corridors
+                    </label><button id="hc-info" class="infoButton">?</button>
+                    (April–May 2022)
+                    <div id="hc-info-box" class="infoBox">
+                        Data from research by PeaceRep and partners<br />
+                        Time period covered by data: 2022-03-05 –
+                        2022-05-04<br />
+                        Last updated: 2022-05
+                    </div>
+                    <div id="hc-options" class="layerOptions"></div>
+                </div>
+		    
 		<div id="acled-header" class="layerHeader loading">
                     <input type="checkbox"
                            name="ACLED"
@@ -186,23 +203,7 @@
                     </div>
                 </div>
 
-                <div id="hc-header" class="layerHeader loading">
-                    <input type="checkbox"
-                           name="Humanitarian Corridors"
-                           id="toggle-hc"
-                           class="filterInput layerToggle" />
-                    <label for="toggle-hc" class="labelDataset">
-                        Humanitarian Corridors
-                    </label><button id="hc-info" class="infoButton">?</button>
-                    (April–May 2022)
-                    <div id="hc-info-box" class="infoBox">
-                        Data from research by PeaceRep and partners<br />
-                        Time period covered by data: 2022-03-05 –
-                        2022-05-04<br />
-                        Last updated: 2022-05
-                    </div>
-                    <div id="hc-options" class="layerOptions"></div>
-                </div>
+               
 
                 <button id="resetFilters" onclick="resetFilters()">
                     Reset filters
