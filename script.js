@@ -44,7 +44,7 @@ const layerSettings =
       { acled: false, ucdp: false, epr: false, powerplants: false, hc: true }
     : // default settings
       // sub-options for each layer are always all checked by default
-      { acled: false, ucdp: false, epr: false, powerplants: true, hc: true };
+      { hc: true, powerplants: true, acled: false, ucdp: false, epr: false,   };
 
 // check boxes accordingly once layers are loaded (see end of map initialization function below)
 
