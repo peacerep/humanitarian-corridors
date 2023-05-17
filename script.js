@@ -491,9 +491,7 @@ Promise.all([
     map.on("click", "hc-layer", (e) => {
       var coordinates = e.lngLat;
       var tooltip =
-        "Humanitarian Corridor:<br>Date: " +
-        e.features[0].properties.date +
-        "<br>From " +
+        "Humanitarian Corridor: <br>From " +
         e.features[0].properties.from_name +
         " (" +
         e.features[0].properties.from_country_code +
@@ -501,8 +499,12 @@ Promise.all([
         e.features[0].properties.to_name +
         " (" +
         e.features[0].properties.to_country_code +
-        ")<br>Status: " +
-        e.features[0].properties.status_result;
+       ")<br>Date: " +
+        e.features[0].properties.date +
+        "<br>Proposal: " +
+        e.features[0].properties.proposal +
+      "<br>Notes: " +
+        e.features[0].properties.text;
       popup.setLngLat(coordinates).setHTML(tooltip).addTo(map);
     });
     // change cursor to pointer when on the powerplants layer
