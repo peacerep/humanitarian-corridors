@@ -491,17 +491,17 @@ Promise.all([
     map.on("click", "hc-layer", (e) => {
       var coordinates = e.lngLat;
       var tooltip =
-        "From: <b> " +
+        "<b>From:</b> " +
         e.features[0].properties.From +
-        "</b> (" +
+        " (" +
         e.features[0].properties.from_country_code +
-        ")<br> To: <b>" +
+        ")<br> <b>To: </b>" +
         e.features[0].properties.To +
         "</b> (" +
         e.features[0].properties.to_country_code +
-       ")<br>Date: " +
+       ")<br><b>Date:</b> " +
         e.features[0].properties.date +
-        "<br>Proposal: " +
+        "<br><b>Proposal:</b> " +
         e.features[0].properties.proposal +
       "<br> " +
         e.features[0].properties.text;
