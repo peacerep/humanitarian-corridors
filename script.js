@@ -491,11 +491,11 @@ Promise.all([
     map.on("click", "hc-layer", (e) => {
       var coordinates = e.lngLat;
       var tooltip =
-        "Humanitarian Corridor: <br>From <b> " +
+        "From: <b> " +
         e.features[0].properties.From +
         "</b> (" +
         e.features[0].properties.from_country_code +
-        ") to <b>" +
+        ")<br> To: <b>" +
         e.features[0].properties.To +
         "</b> (" +
         e.features[0].properties.to_country_code +
