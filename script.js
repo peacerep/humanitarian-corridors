@@ -491,19 +491,19 @@ Promise.all([
     map.on("click", "hc-layer", (e) => {
       var coordinates = e.lngLat;
       var tooltip =
-        "Humanitarian Corridor: <br>From " +
-        e.features[0].properties.from_name +
-        " (" +
+        "Humanitarian Corridor: <br>From <b> " +
+        e.features[0].properties.From +
+        "</b> (" +
         e.features[0].properties.from_country_code +
-        ") to " +
-        e.features[0].properties.to_name +
-        " (" +
+        ") to <b>" +
+        e.features[0].properties.To +
+        "</b> (" +
         e.features[0].properties.to_country_code +
        ")<br>Date: " +
         e.features[0].properties.date +
         "<br>Proposal: " +
         e.features[0].properties.proposal +
-      "<br>Notes: " +
+      "<br> " +
         e.features[0].properties.text;
       popup.setLngLat(coordinates).setHTML(tooltip).addTo(map);
     });
