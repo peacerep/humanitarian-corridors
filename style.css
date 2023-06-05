@@ -128,7 +128,7 @@ button#captureScreenshot {
 }
 
 #sidebar-footer img {
-	width: 132px;
+	width: 125px;
 	height: 42px;
 	/*	aspect-ratio: 480 / 151;*/
 	object-fit: contain;
